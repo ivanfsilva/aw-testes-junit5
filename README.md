@@ -1,6 +1,6 @@
 <div align="center">
 
-[![Português](https://img.shields.io/badge/Idioma-Portugu%C3%Aas-green.svg)](./README.md)
+[![Português](https://img.shields.io/badge/Idioma-Portugu%C3%Aas-green.svg)](./)
 [![English](https://img.shields.io/badge/Language-English-blue.svg)](./README.en.md)
 [![Español](https://img.shields.io/badge/Idioma-Espa%C3%B1ol-yellow.svg)](./README.es.md)
 
