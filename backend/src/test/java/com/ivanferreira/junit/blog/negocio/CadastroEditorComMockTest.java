@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,7 +34,7 @@ public class CadastroEditorComMockTest {
     class CadastroComEditorValido {
 
         @Spy
-        Editor editor = new Editor(null, "Alex", "alex@email.com", BigDecimal.TEN, true);
+        Editor editor = EditorTestData.umEditorNovo();
 
         @BeforeEach
         void init() {
@@ -56,7 +55,7 @@ public class CadastroEditorComMockTest {
         @Test
         void Dado_um_editor_valido_Quando_criar_Entao_deve_chamar_metodo_salvar_do_armazenamento() {
             cadastroEditor.criar(editor);
-            verify(armazenamentoEditor, times(1))
+            Mockito.verify(armazenamentoEditor, times(1))
                     .salvar(Mockito.eq(editor));
         }
 
@@ -65,7 +64,7 @@ public class CadastroEditorComMockTest {
             Mockito.when(armazenamentoEditor.salvar(editor)).thenThrow(new RuntimeException());
             assertAll("Não deve enviar e-mail, quando lançar Exception do armazenamento",
                     ()->assertThrows(RuntimeException.class, ()-> cadastroEditor.criar(editor)),
-                    ()-> verify(gerenciadorEnvioEmail, never()).enviarEmail(Mockito.any())
+                    ()->Mockito.verify(gerenciadorEnvioEmail, Mockito.never()).enviarEmail(Mockito.any())
             );
         }
 
@@ -73,7 +72,7 @@ public class CadastroEditorComMockTest {
         void Dado_um_editor_valido_Quando_cadastrar_Entao_deve_enviar_email_com_destino_ao_editor() {
             Editor editoSalvo = cadastroEditor.criar(editor);
 
-            verify(gerenciadorEnvioEmail).enviarEmail(mensagemArgumentCaptor.capture());
+            Mockito.verify(gerenciadorEnvioEmail).enviarEmail(mensagemArgumentCaptor.capture());
 
             Mensagem mensagem = mensagemArgumentCaptor.getValue();
 
@@ -83,7 +82,7 @@ public class CadastroEditorComMockTest {
         @Test
         void Dado_um_editor_valido_Quando_cadastrar_Entao_deve_verificar_o_email() {
             cadastroEditor.criar(editor);
-            verify(editor, Mockito.atLeast(1)).getEmail();
+            Mockito.verify(editor, Mockito.atLeast(1)).getEmail();
         }
 
         @Test
@@ -91,7 +90,7 @@ public class CadastroEditorComMockTest {
             Mockito.when(armazenamentoEditor.encontrarPorEmail("alex@email.com"))
                     .thenReturn(Optional.empty())
                     .thenReturn(Optional.of(editor));
-            Editor editorComEmailExistente = new Editor(null, "Alex", "alex@email.com", BigDecimal.TEN, true);
+            Editor editorComEmailExistente = EditorTestData.umEditorNovo();
             cadastroEditor.criar(editor);
             assertThrows(RegraNegocioException.class, ()-> cadastroEditor.criar(editorComEmailExistente));
         }
@@ -111,15 +110,15 @@ public class CadastroEditorComMockTest {
         @Test
         void Dado_um_editor_null_Quando_cadastrar_Entao_deve_lancar_exception() {
             Assertions.assertThrows(NullPointerException.class, ()-> cadastroEditor.criar(null));
-            verify(armazenamentoEditor, never()).salvar(Mockito.any());
-            verify(gerenciadorEnvioEmail, never()).enviarEmail(Mockito.any());
+            Mockito.verify(armazenamentoEditor, Mockito.never()).salvar(Mockito.any());
+            Mockito.verify(gerenciadorEnvioEmail, Mockito.never()).enviarEmail(Mockito.any());
         }
     }
 
     @Nested
     class EdicaoComEditorValido {
         @Spy
-        Editor editor = new Editor(1L, "Alex", "alex@email.com", BigDecimal.TEN, true);
+        Editor editor = EditorTestData.umEditorExistente();
 
         @BeforeEach
         void init() {
@@ -129,9 +128,12 @@ public class CadastroEditorComMockTest {
 
         @Test
         void dado_um_editor_valido_Quando_editar_Entao_deve_alterar_editor_salvo() {
-            Editor editorAtualizado = new Editor(1L, "Alex Silva", "alex.silva@email.com", BigDecimal.ZERO, false);
+            Editor editorAtualizado = EditorTestData.umEditorExistente();
+            editorAtualizado.setEmail("alex.silva@email.com");
+            editorAtualizado.setNome("Alex Silva");
+
             cadastroEditor.editar(editorAtualizado);
-            verify(editor, times(1)).atualizarComDados(editorAtualizado);
+            Mockito.verify(editor, times(1)).atualizarComDados(editorAtualizado);
 
             InOrder inOrder = Mockito.inOrder(editor, armazenamentoEditor);
             inOrder.verify(editor).atualizarComDados(editorAtualizado);
@@ -142,7 +144,7 @@ public class CadastroEditorComMockTest {
     @Nested
     class EdicaoComEditorInexistente {
 
-        Editor editor = new Editor(99L, "Alex", "alex@email.com", BigDecimal.TEN, true);
+        Editor editor = EditorTestData.umEditorComIdInexistente();
 
         @BeforeEach
         void init() {
