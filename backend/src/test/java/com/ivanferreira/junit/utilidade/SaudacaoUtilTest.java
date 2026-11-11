@@ -8,6 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static com.ivanferreira.junit.utilidade.SaudacaoUtil.saudar;
+import static com.ivanferreira.junit.utilidade.SaudacaoUtilConditions.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,12 +19,7 @@ class SaudacaoUtilTest {
     public void Dado_uma_horario_matuino_Quando_saudar_Entao_deve_retornar_bom_dia() {
         int horaValida = 9;
         String saudacao = saudar(horaValida);
-        String saudacaoCorreta = "Bom dia";
-
-        assertThat(saudacao)
-                .as("Validando se a saudação é %s", saudacaoCorreta)
-                .withFailMessage("Erro: Saudação incorreta! Resultado: %s", saudacao)
-                .isEqualTo(saudacaoCorreta);
+        assertThat(saudacao).is(igualBomDia());
     }
 
     @Test
