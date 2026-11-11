@@ -1,66 +1,59 @@
 package com.ivanferreira.junit.utilidade;
 
+import org.junit.jupiter.api.DisplayNameGeneration;
+import org.junit.jupiter.api.DisplayNameGenerator;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import static com.ivanferreira.junit.utilidade.SaudacaoUtil.saudar;
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.Test;
-
+@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class SaudacaoUtilTest {
+
     @Test
-    void saudar_DeveRetornarBomDia_NoLimiteDasZeroHora() {
-        int horaInicial = 0;
-        assertEquals("Bom dia", SaudacaoUtil.saudar(horaInicial));
+    public void Dado_uma_horario_matuino_Quando_saudar_Entao_deve_retornar_bom_dia() {
+        int horaValida = 9;
+        String saudacao = saudar(horaValida);
+        assertEquals("Bom dia", saudacao);
     }
 
     @Test
-    void saudar_DeveRetornarBomDia_NoLimiteDasOnze() {
-        int horaFinal = 11;
-        assertEquals("Bom dia", SaudacaoUtil.saudar(horaFinal));
+    public void Dado_uma_horario_vespertino_Quando_saudar_Entao_deve_retornar_boa_tarde() {
+        int horaValida = 15;
+        String saudacao = saudar(horaValida);
+        assertEquals("Boa tarde", saudacao);
     }
 
     @Test
-    void saudar_DeveRetornarBoaTarde_NoLimiteDasDoze() {
-        int horaInicial = 12;
-        assertEquals("Boa tarde", SaudacaoUtil.saudar(horaInicial));
+    public void Dado_uma_horario_noturno_Quando_saudar_Entao_deve_retornar_boa_noite() {
+        int horaValida = 4;
+        String saudacao = saudar(horaValida);
+        assertEquals("Boa noite", saudacao);
     }
 
     @Test
-    void saudar_DeveRetornarBoaTarde_NoLimiteDasDezessete() {
-        int horaFinal = 17;
-        assertEquals("Boa tarde", SaudacaoUtil.saudar(horaFinal));
+    public void Dado_uma_hora_invalida_Quando_saudar_Entao_deve_lancar_exception() {
+        int horaInvalida = -10;
+        Executable chamadaInvalidaDeMetodo = () -> saudar(horaInvalida);
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, chamadaInvalidaDeMetodo);
+        assertEquals("Hora inválida", e.getMessage());
     }
 
     @Test
-    void saudar_DeveRetornarBoaNoite_NoLimiteDasDezoito() {
-        int horaInicial = 18;
-        assertEquals("Boa noite", SaudacaoUtil.saudar(horaInicial));
+    public void Dado_uma_hora_valida_Quando_saudar_Entao_nao_deve_lancar_exception() {
+        int horaValida = 0;
+        Executable chamadaValidaDeMetodo = () -> saudar(horaValida);
+        assertDoesNotThrow(chamadaValidaDeMetodo);
     }
 
-    @Test
-    void saudar_DeveRetornarBoaNoite_NoLimiteDasVinteETres() {
-        int horaFinal = 23;
-        assertEquals("Boa noite", SaudacaoUtil.saudar(horaFinal));
+    @ParameterizedTest
+    @ValueSource(ints = {5,6,7,8,9,10,11})
+    public void Dado_horario_matinal_Entao_deve_retornar_bom_dia(int hora) {
+        String saudacao = SaudacaoUtil.saudar(hora);
+        assertEquals("Bom dia", saudacao);
     }
 
-    @Test
-    void saudar_DeveLancarExcecaoEMensagem_HoraNegativa() {
-        int horaInvalidaNegativa = -1;
-
-        IllegalArgumentException exNegativa = assertThrows(
-                IllegalArgumentException.class,
-                () -> SaudacaoUtil.saudar(horaInvalidaNegativa)
-        );
-        assertEquals("Hora inválida", exNegativa.getMessage());
-
-    }
-
-    @Test
-    void saudar_DeveLancarExcecaoEMensagem_NoLimiteExcedente() {
-        int horaInvalidaExcedente = 24;
-
-        IllegalArgumentException exExcedente = assertThrows(
-                IllegalArgumentException.class,
-                () -> SaudacaoUtil.saudar(horaInvalidaExcedente)
-        );
-        assertEquals("Hora inválida", exExcedente.getMessage());
-    }
 }
